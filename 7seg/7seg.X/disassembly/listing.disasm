@@ -1,0 +1,836 @@
+Disassembly Listing for 7seg
+Generated From:
+C:/Users/ASUS/Documents/GitHub/dig2C/7seg/7seg.X/dist/default/debug/7seg.X.debug.elf
+26/10/2020 08:29:56 AM
+
+---  D:/mplab/sources/common/lwmod.c  -------------------------------------------------------------------
+1:             // word unsigned modulus
+2:             
+3:             unsigned int
+4:             #ifdef __PICC__
+5:             #warning TODO: update cgpic and this file to use the other prototype
+6:             __lwmod(unsigned int divisor, unsigned int dividend)
+7:             #else
+8:             __lwmod(unsigned int dividend, unsigned int divisor)
+9:             #endif
+10:            {
+11:            	unsigned char	counter;
+12:            
+13:            	if(divisor != 0) {
+05D7  0870     MOVF __pcstackCOMMON, W
+05D8  0471     IORWF 0x71, W
+05D9  1903     BTFSC STATUS, 0x2
+05DA  2E04     GOTO 0x604
+14:            		counter = 1;
+05DB  01F5     CLRF counter
+05DC  0AF5     INCF counter, F
+15:            		while((divisor & 0x8000) == 0) {
+05DD  1BF1     BTFSC 0x71, 0x7
+05DE  2DEB     GOTO 0x5EB
+05EA  2DDD     GOTO 0x5DD
+16:            			divisor <<= 1;
+05DF  3001     MOVLW 0x1
+05E0  1003     BCF STATUS, 0x0
+05E1  0DF0     RLF __pcstackCOMMON, F
+05E2  0DF1     RLF 0x71, F
+05E3  3EFF     ADDLW 0xFF
+05E4  1D03     BTFSS STATUS, 0x2
+05E5  2DE0     GOTO 0x5E0
+17:            			counter++;
+05E6  3001     MOVLW 0x1
+05E7  00F4     MOVWF 0x74
+05E8  0874     MOVF 0x74, W
+05E9  07F5     ADDWF counter, F
+18:            		}
+19:            		do {
+20:            			if(divisor <= dividend)
+05EB  0871     MOVF 0x71, W
+05EC  0273     SUBWF 0x73, W
+05ED  1D03     BTFSS STATUS, 0x2
+05EE  2DF1     GOTO 0x5F1
+05EF  0870     MOVF __pcstackCOMMON, W
+05F0  0272     SUBWF dividend, W
+05F1  1C03     BTFSS STATUS, 0x0
+05F2  2DF9     GOTO 0x5F9
+21:            				dividend -= divisor;
+05F3  0870     MOVF __pcstackCOMMON, W
+05F4  02F2     SUBWF dividend, F
+05F5  0871     MOVF 0x71, W
+05F6  1C03     BTFSS STATUS, 0x0
+05F7  03F3     DECF 0x73, F
+05F8  02F3     SUBWF 0x73, F
+22:            			divisor >>= 1;
+05F9  3001     MOVLW 0x1
+05FA  1003     BCF STATUS, 0x0
+05FB  0CF1     RRF 0x71, F
+05FC  0CF0     RRF __pcstackCOMMON, F
+05FD  3EFF     ADDLW 0xFF
+05FE  1D03     BTFSS STATUS, 0x2
+05FF  2DFA     GOTO 0x5FA
+23:            		} while(--counter != 0);
+0600  3001     MOVLW 0x1
+0601  02F5     SUBWF counter, F
+0602  1D03     BTFSS STATUS, 0x2
+0603  2DEB     GOTO 0x5EB
+24:            	}
+25:            	return dividend;
+0604  0873     MOVF 0x73, W
+0605  00F1     MOVWF 0x71
+0606  0872     MOVF dividend, W
+0607  00F0     MOVWF __pcstackCOMMON
+0608  0008     RETURN
+26:            }
+---  D:/mplab/sources/common/lwdiv.c  -------------------------------------------------------------------
+1:             // word unsigned division
+2:             
+3:             unsigned int
+4:             #ifdef __PICC__
+5:             #warning TODO: update cgpic and this file to use the other prototype
+6:             __lwdiv(unsigned int divisor, unsigned int dividend)
+7:             #else
+8:             __lwdiv(unsigned int dividend, unsigned int divisor)
+9:             #endif
+10:            {
+11:            	unsigned int	quotient;
+12:            	unsigned char	counter;
+13:            
+14:            	quotient = 0;
+0609  01F5     CLRF counter
+060A  01F6     CLRF sign
+15:            	if(divisor != 0) {
+060B  0870     MOVF __pcstackCOMMON, W
+060C  0471     IORWF 0x71, W
+060D  1903     BTFSC STATUS, 0x2
+060E  2E40     GOTO 0x640
+16:            		counter = 1;
+060F  01F7     CLRF quotient
+0610  0AF7     INCF quotient, F
+17:            		while((divisor & 0x8000) == 0) {
+0611  1BF1     BTFSC 0x71, 0x7
+0612  2E1F     GOTO 0x61F
+061E  2E11     GOTO 0x611
+18:            			divisor <<= 1;
+0613  3001     MOVLW 0x1
+0614  1003     BCF STATUS, 0x0
+0615  0DF0     RLF __pcstackCOMMON, F
+0616  0DF1     RLF 0x71, F
+0617  3EFF     ADDLW 0xFF
+0618  1D03     BTFSS STATUS, 0x2
+0619  2E14     GOTO 0x614
+19:            			counter++;
+061A  3001     MOVLW 0x1
+061B  00F4     MOVWF 0x74
+061C  0874     MOVF 0x74, W
+061D  07F7     ADDWF quotient, F
+20:            		}
+21:            		do {
+22:            			quotient <<= 1;
+061F  3001     MOVLW 0x1
+0620  1003     BCF STATUS, 0x0
+0621  0DF5     RLF counter, F
+0622  0DF6     RLF sign, F
+0623  3EFF     ADDLW 0xFF
+0624  1D03     BTFSS STATUS, 0x2
+0625  2E20     GOTO 0x620
+23:            			if(divisor <= dividend) {
+0626  0871     MOVF 0x71, W
+0627  0273     SUBWF 0x73, W
+0628  1D03     BTFSS STATUS, 0x2
+0629  2E2C     GOTO 0x62C
+062A  0870     MOVF __pcstackCOMMON, W
+062B  0272     SUBWF dividend, W
+062C  1C03     BTFSS STATUS, 0x0
+062D  2E35     GOTO 0x635
+24:            				dividend -= divisor;
+062E  0870     MOVF __pcstackCOMMON, W
+062F  02F2     SUBWF dividend, F
+0630  0871     MOVF 0x71, W
+0631  1C03     BTFSS STATUS, 0x0
+0632  03F3     DECF 0x73, F
+0633  02F3     SUBWF 0x73, F
+25:            				quotient |= 1;
+0634  1475     BSF counter, 0x0
+26:            			}
+27:            			divisor >>= 1;
+0635  3001     MOVLW 0x1
+0636  1003     BCF STATUS, 0x0
+0637  0CF1     RRF 0x71, F
+0638  0CF0     RRF __pcstackCOMMON, F
+0639  3EFF     ADDLW 0xFF
+063A  1D03     BTFSS STATUS, 0x2
+063B  2E36     GOTO 0x636
+28:            		} while(--counter != 0);
+063C  3001     MOVLW 0x1
+063D  02F7     SUBWF quotient, F
+063E  1D03     BTFSS STATUS, 0x2
+063F  2E1F     GOTO 0x61F
+29:            	}
+30:            	return quotient;
+0640  0876     MOVF sign, W
+0641  00F1     MOVWF 0x71
+0642  0875     MOVF counter, W
+0643  00F0     MOVWF __pcstackCOMMON
+0644  0008     RETURN
+31:            }
+---  D:/mplab/sources/common/awmod.c  -------------------------------------------------------------------
+1:             // integer signed unsigned modulus
+2:             
+3:             signed int
+4:             #ifdef __PICC__
+5:             #warning TODO: update cgpic and this file to use the other prototype
+6:             __awmod(signed int divisor, signed int dividend)
+7:             #else
+8:             __awmod(signed int dividend, signed int divisor)
+9:             #endif
+10:            {
+11:            	unsigned char	counter, sign;
+12:            
+13:            	sign = 0;
+0645  01F6     CLRF sign
+14:            	if(dividend < 0) {
+0646  1FF3     BTFSS 0x73, 0x7
+0647  2E4F     GOTO 0x64F
+15:            		dividend = -dividend;
+0648  09F2     COMF dividend, F
+0649  09F3     COMF 0x73, F
+064A  0AF2     INCF dividend, F
+064B  1903     BTFSC STATUS, 0x2
+064C  0AF3     INCF 0x73, F
+16:            		sign = 1;
+064D  01F6     CLRF sign
+064E  0AF6     INCF sign, F
+17:            	}
+18:            	if(divisor < 0)
+064F  1FF1     BTFSS 0x71, 0x7
+0650  2E56     GOTO 0x656
+19:            		divisor = -divisor;
+0651  09F0     COMF __pcstackCOMMON, F
+0652  09F1     COMF 0x71, F
+0653  0AF0     INCF __pcstackCOMMON, F
+0654  1903     BTFSC STATUS, 0x2
+0655  0AF1     INCF 0x71, F
+20:            	if(divisor != 0) {
+0656  0870     MOVF __pcstackCOMMON, W
+0657  0471     IORWF 0x71, W
+0658  1903     BTFSC STATUS, 0x2
+0659  2E83     GOTO 0x683
+21:            		counter = 1;
+065A  01F5     CLRF counter
+065B  0AF5     INCF counter, F
+22:            		while(((unsigned int)divisor & 0x8000U) == 0) {
+065C  1BF1     BTFSC 0x71, 0x7
+065D  2E6A     GOTO 0x66A
+0669  2E5C     GOTO 0x65C
+23:            			divisor <<= 1;
+065E  3001     MOVLW 0x1
+065F  1003     BCF STATUS, 0x0
+0660  0DF0     RLF __pcstackCOMMON, F
+0661  0DF1     RLF 0x71, F
+0662  3EFF     ADDLW 0xFF
+0663  1D03     BTFSS STATUS, 0x2
+0664  2E5F     GOTO 0x65F
+24:            			counter++;
+0665  3001     MOVLW 0x1
+0666  00F4     MOVWF 0x74
+0667  0874     MOVF 0x74, W
+0668  07F5     ADDWF counter, F
+25:            		}
+26:            		do {
+27:            			if((unsigned int)divisor <= (unsigned int)dividend)
+066A  0871     MOVF 0x71, W
+066B  0273     SUBWF 0x73, W
+066C  1D03     BTFSS STATUS, 0x2
+066D  2E70     GOTO 0x670
+066E  0870     MOVF __pcstackCOMMON, W
+066F  0272     SUBWF dividend, W
+0670  1C03     BTFSS STATUS, 0x0
+0671  2E78     GOTO 0x678
+28:            				dividend -= divisor;
+0672  0870     MOVF __pcstackCOMMON, W
+0673  02F2     SUBWF dividend, F
+0674  0871     MOVF 0x71, W
+0675  1C03     BTFSS STATUS, 0x0
+0676  03F3     DECF 0x73, F
+0677  02F3     SUBWF 0x73, F
+29:            			*(unsigned int *)&divisor >>= 1;
+0678  3001     MOVLW 0x1
+0679  1003     BCF STATUS, 0x0
+067A  0CF1     RRF 0x71, F
+067B  0CF0     RRF __pcstackCOMMON, F
+067C  3EFF     ADDLW 0xFF
+067D  1D03     BTFSS STATUS, 0x2
+067E  2E79     GOTO 0x679
+30:            		} while(--counter != 0);
+067F  3001     MOVLW 0x1
+0680  02F5     SUBWF counter, F
+0681  1D03     BTFSS STATUS, 0x2
+0682  2E6A     GOTO 0x66A
+31:            	}
+32:            	if(sign)
+0683  0876     MOVF sign, W
+0684  1903     BTFSC STATUS, 0x2
+0685  2E8B     GOTO 0x68B
+33:            		dividend = -dividend;
+0686  09F2     COMF dividend, F
+0687  09F3     COMF 0x73, F
+0688  0AF2     INCF dividend, F
+0689  1903     BTFSC STATUS, 0x2
+068A  0AF3     INCF 0x73, F
+34:            	return dividend;
+068B  0873     MOVF 0x73, W
+068C  00F1     MOVWF 0x71
+068D  0872     MOVF dividend, W
+068E  00F0     MOVWF __pcstackCOMMON
+068F  0008     RETURN
+35:            }
+---  D:/mplab/sources/common/awdiv.c  -------------------------------------------------------------------
+1:             // integer signed division
+2:             
+3:             signed int
+4:             #ifdef __PICC__
+5:             #warning TODO: update cgpic and this file to use the other prototype
+6:             __awdiv(signed int divisor, signed int dividend)
+7:             #else
+8:             __awdiv(signed int dividend, signed int divisor)
+9:             #endif
+10:            {
+11:            	signed int	quotient;
+12:            	unsigned char	counter, sign;
+13:            
+14:            	sign = 0;
+0690  01F6     CLRF sign
+15:            	if(divisor < 0) {
+0691  1FF1     BTFSS 0x71, 0x7
+0692  2E9A     GOTO 0x69A
+16:            		divisor = -divisor;
+0693  09F0     COMF __pcstackCOMMON, F
+0694  09F1     COMF 0x71, F
+0695  0AF0     INCF __pcstackCOMMON, F
+0696  1903     BTFSC STATUS, 0x2
+0697  0AF1     INCF 0x71, F
+17:            		sign = 1;
+0698  01F6     CLRF sign
+0699  0AF6     INCF sign, F
+18:            	}
+19:            	if(dividend < 0) {
+069A  1FF3     BTFSS 0x73, 0x7
+069B  2EA5     GOTO 0x6A5
+20:            		dividend = -dividend;
+069C  09F2     COMF dividend, F
+069D  09F3     COMF 0x73, F
+069E  0AF2     INCF dividend, F
+069F  1903     BTFSC STATUS, 0x2
+06A0  0AF3     INCF 0x73, F
+21:            		sign ^= 1;
+06A1  3001     MOVLW 0x1
+06A2  00F4     MOVWF 0x74
+06A3  0874     MOVF 0x74, W
+06A4  06F6     XORWF sign, F
+22:            	}
+23:            	quotient = 0;
+06A5  01F7     CLRF quotient
+06A6  01F8     CLRF 0x78
+24:            	if(divisor != 0) {
+06A7  0870     MOVF __pcstackCOMMON, W
+06A8  0471     IORWF 0x71, W
+06A9  1903     BTFSC STATUS, 0x2
+06AA  2EDC     GOTO 0x6DC
+25:            		counter = 1;
+06AB  01F5     CLRF counter
+06AC  0AF5     INCF counter, F
+26:            		while((divisor & 0x8000U) == 0) {
+06AD  1BF1     BTFSC 0x71, 0x7
+06AE  2EBB     GOTO 0x6BB
+06BA  2EAD     GOTO 0x6AD
+27:            			divisor <<= 1;
+06AF  3001     MOVLW 0x1
+06B0  1003     BCF STATUS, 0x0
+06B1  0DF0     RLF __pcstackCOMMON, F
+06B2  0DF1     RLF 0x71, F
+06B3  3EFF     ADDLW 0xFF
+06B4  1D03     BTFSS STATUS, 0x2
+06B5  2EB0     GOTO 0x6B0
+28:            			counter++;
+06B6  3001     MOVLW 0x1
+06B7  00F4     MOVWF 0x74
+06B8  0874     MOVF 0x74, W
+06B9  07F5     ADDWF counter, F
+29:            		}
+30:            		do {
+31:            			quotient <<= 1;
+06BB  3001     MOVLW 0x1
+06BC  1003     BCF STATUS, 0x0
+06BD  0DF7     RLF quotient, F
+06BE  0DF8     RLF 0x78, F
+06BF  3EFF     ADDLW 0xFF
+06C0  1D03     BTFSS STATUS, 0x2
+06C1  2EBC     GOTO 0x6BC
+32:            			if((unsigned int)divisor <= (unsigned int)dividend) {
+06C2  0871     MOVF 0x71, W
+06C3  0273     SUBWF 0x73, W
+06C4  1D03     BTFSS STATUS, 0x2
+06C5  2EC8     GOTO 0x6C8
+06C6  0870     MOVF __pcstackCOMMON, W
+06C7  0272     SUBWF dividend, W
+06C8  1C03     BTFSS STATUS, 0x0
+06C9  2ED1     GOTO 0x6D1
+33:            				dividend -= divisor;
+06CA  0870     MOVF __pcstackCOMMON, W
+06CB  02F2     SUBWF dividend, F
+06CC  0871     MOVF 0x71, W
+06CD  1C03     BTFSS STATUS, 0x0
+06CE  03F3     DECF 0x73, F
+06CF  02F3     SUBWF 0x73, F
+34:            				quotient |= 1;
+06D0  1477     BSF quotient, 0x0
+35:            			}
+36:            			*(unsigned int *)&divisor >>= 1;
+06D1  3001     MOVLW 0x1
+06D2  1003     BCF STATUS, 0x0
+06D3  0CF1     RRF 0x71, F
+06D4  0CF0     RRF __pcstackCOMMON, F
+06D5  3EFF     ADDLW 0xFF
+06D6  1D03     BTFSS STATUS, 0x2
+06D7  2ED2     GOTO 0x6D2
+37:            		} while(--counter != 0);
+06D8  3001     MOVLW 0x1
+06D9  02F5     SUBWF counter, F
+06DA  1D03     BTFSS STATUS, 0x2
+06DB  2EBB     GOTO 0x6BB
+38:            	}
+39:            	if(sign)
+06DC  0876     MOVF sign, W
+06DD  1903     BTFSC STATUS, 0x2
+06DE  2EE4     GOTO 0x6E4
+40:            		quotient = -quotient;
+06DF  09F7     COMF quotient, F
+06E0  09F8     COMF 0x78, F
+06E1  0AF7     INCF quotient, F
+06E2  1903     BTFSC STATUS, 0x2
+06E3  0AF8     INCF 0x78, F
+41:            	return quotient;
+06E4  0878     MOVF 0x78, W
+06E5  00F1     MOVWF 0x71
+06E6  0877     MOVF quotient, W
+06E7  00F0     MOVWF __pcstackCOMMON
+06E8  0008     RETURN
+42:            }
+---  C:/Users/ASUS/Documents/GitHub/dig2C/7seg/7seg.X/main7seg.c  ---------------------------------------
+1:             // CONFIG
+2:             #pragma config FOSC = HS        // Oscillator Selection bits (HS oscillator)
+3:             #pragma config WDTE = OFF       // Watchdog Timer Enable bit (WDT disabled)
+4:             #pragma config PWRTE = OFF       // Power-up Timer Enable bit (PWRT enabled)
+5:             #pragma config BOREN = OFF       // Brown-out Reset Enable bit (BOR enabled)
+6:             #pragma config LVP = OFF        // Low-Voltage (Single-Supply) In-Circuit Serial Programming Enable bit (RB3 is digital I/O, HV on MCLR must be used for programming)
+7:             #pragma config CPD = OFF        // Data EEPROM Memory Code Protection bit (Data EEPROM code protection off)
+8:             #pragma config WRT = OFF        // Flash Program Memory Write Enable bits (Write protection off; all program memory may be written to by EECON control)
+9:             #pragma config CP = OFF         // Flash Program Memory Code Protection bit (Code protection off)
+10:            
+11:            // #pragma config statements should precede project file includes.
+12:            // Use project enums instead of #define for ON and OFF.
+13:            
+14:            #include <xc.h>
+15:            
+16:            
+17:            void USART_Init(long);
+18:            void USART_TxChar(char);
+19:            void USART_SendString(const char *);
+20:            char USART_RxChar();
+21:            
+22:            #define F_CPU 8000000/64
+23:            //#define Baud_value(baud_rate) (((float)(F_CPU)/(float)baud_rate)-1)
+24:            #define Baud_value (((float)(F_CPU)/(float)baud_rate)-1)
+25:            
+26:            
+27:            //***Define the signal pins of all four displays***//
+28:            #define s1 RE0
+29:            #define s2 RE1
+30:            
+31:            //***End of definition**////
+32:            
+33:            void main(){
+34:            unsigned int a,b,c,d,e,f,g,h; //just variables
+35:            int i = 0; //the 4-digit value that is to be displayed
+06E9  1283     BCF STATUS, 0x5
+06EA  1303     BCF STATUS, 0x6
+06EB  01C6     CLRF i
+06EC  01C7     CLRF 0x47
+36:            int flag =0; //for creating delay
+06ED  01BE     CLRF flag
+06EE  01BF     CLRF 0x3F
+37:            
+38:            unsigned int seg[]={0X3F, //Hex value to display the number 0
+39:                                0X06, //Hex value to display the number 1
+40:                                0X5B, //Hex value to display the number 2
+41:                                0X4F, //Hex value to display the number 3
+42:                                0X66, //Hex value to display the number 4
+43:                                0X6D, //Hex value to display the number 5
+44:                                0X7C, //Hex value to display the number 6
+45:                                0X07, //Hex value to display the number 7
+46:                                0X7F, //Hex value to display the number 8
+47:                                0X6F  //Hex value to display the number 9
+48:                               }; //End of Array for displaying numbers from 0 to 9
+06EF  3020     MOVLW 0x20
+06F0  0084     MOVWF FSR
+06F1  3048     MOVLW 0x48
+06F2  00F9     MOVWF 0x79
+06F3  0804     MOVF FSR, W
+06F4  00FA     MOVWF 0x7A
+06F5  3014     MOVLW 0x14
+06F6  00FB     MOVWF 0x7B
+06F7  0879     MOVF 0x79, W
+06F8  0084     MOVWF FSR
+06F9  1383     BCF STATUS, 0x7
+06FA  0800     MOVF INDF, W
+06FB  00FC     MOVWF 0x7C
+06FC  0AF9     INCF 0x79, F
+06FD  087A     MOVF 0x7A, W
+06FE  0084     MOVWF FSR
+06FF  087C     MOVF 0x7C, W
+0700  0080     MOVWF INDF
+0701  0AFA     INCF 0x7A, F
+0702  0BFB     DECFSZ 0x7B, F
+0703  2EF7     GOTO 0x6F7
+49:            
+50:            //*****I/O Configuration****//
+51:            TRISE=0X00;
+0704  1683     BSF STATUS, 0x5
+0705  1303     BCF STATUS, 0x6
+0706  0189     CLRF PORTE
+52:            PORTE=0X00;
+0707  1283     BCF STATUS, 0x5
+0708  1303     BCF STATUS, 0x6
+0709  0189     CLRF PORTE
+53:            TRISD=0x00;
+070A  1683     BSF STATUS, 0x5
+070B  1303     BCF STATUS, 0x6
+070C  0188     CLRF PORTD
+54:            PORTD=0X00;
+070D  1283     BCF STATUS, 0x5
+070E  1303     BCF STATUS, 0x6
+070F  0188     CLRF PORTD
+55:            //***End of I/O configuration**///
+56:            //TRISAbits.TRISA0=1;//el pin RA0 como entrada digital  
+57:            //TRISBbits.TRISB3=0;//el pin RB3 como salida digital
+58:            //TRISBbits.TRISB4=0;//el pin RB4 como salida digital
+59:                
+60:            //PORTBbits.RB3=0;//el led en el pin RB3 inicia apagado
+61:            //PORTBbits.RB4=0;//el led en el pin RB4 inicia encendido
+62:            
+63:            
+64:            
+65:            #define _XTAL_FREQ 20000000
+66:            //int F = 0;
+67:            
+68:            //for(int i=0;i<5;i++){
+69:            //    F++;
+70:               
+71:            //}
+72:            
+73:            //do{
+74:            //    led_enc();
+75:                
+76:            //}while(F == 1);
+77:            
+78:            while(1)
+07EF  2F10     GOTO 0x710
+79:            {
+80:                //a = 24;
+81:                //a=a%10; //4 units
+82:                //a=a/10; //2 Tens
+83:                
+84:                
+85:                //***Splitting "i" into four digits***//  
+86:                a=i%10;//4th digit is saved here
+0710  300A     MOVLW 0xA
+0711  00F0     MOVWF __pcstackCOMMON
+0712  3000     MOVLW 0x0
+0713  00F1     MOVWF 0x71
+0714  0847     MOVF 0x47, W
+0715  00F3     MOVWF 0x73
+0716  0846     MOVF i, W
+0717  00F2     MOVWF dividend
+0718  120A     BCF PCLATH, 0x4
+0719  118A     BCF PCLATH, 0x3
+071A  2645     CALL 0x645
+071B  120A     BCF PCLATH, 0x4
+071C  118A     BCF PCLATH, 0x3
+071D  0871     MOVF 0x71, W
+071E  1283     BCF STATUS, 0x5
+071F  1303     BCF STATUS, 0x6
+0720  00BB     MOVWF 0x3B
+0721  0870     MOVF __pcstackCOMMON, W
+0722  00BA     MOVWF a
+87:                b=i/10;
+0723  300A     MOVLW 0xA
+0724  00F0     MOVWF __pcstackCOMMON
+0725  3000     MOVLW 0x0
+0726  00F1     MOVWF 0x71
+0727  0847     MOVF 0x47, W
+0728  00F3     MOVWF 0x73
+0729  0846     MOVF i, W
+072A  00F2     MOVWF dividend
+072B  120A     BCF PCLATH, 0x4
+072C  118A     BCF PCLATH, 0x3
+072D  2690     CALL 0x690
+072E  120A     BCF PCLATH, 0x4
+072F  118A     BCF PCLATH, 0x3
+0730  0871     MOVF 0x71, W
+0731  1283     BCF STATUS, 0x5
+0732  1303     BCF STATUS, 0x6
+0733  00C1     MOVWF 0x41
+0734  0870     MOVF __pcstackCOMMON, W
+0735  00C0     MOVWF b
+88:                c=b%10;//3rd digit is saved here
+0736  300A     MOVLW 0xA
+0737  00F0     MOVWF __pcstackCOMMON
+0738  3000     MOVLW 0x0
+0739  00F1     MOVWF 0x71
+073A  0841     MOVF 0x41, W
+073B  00F3     MOVWF 0x73
+073C  0840     MOVF b, W
+073D  00F2     MOVWF dividend
+073E  120A     BCF PCLATH, 0x4
+073F  118A     BCF PCLATH, 0x3
+0740  25D7     CALL 0x5D7
+0741  120A     BCF PCLATH, 0x4
+0742  118A     BCF PCLATH, 0x3
+0743  0871     MOVF 0x71, W
+0744  1283     BCF STATUS, 0x5
+0745  1303     BCF STATUS, 0x6
+0746  00BD     MOVWF 0x3D
+0747  0870     MOVF __pcstackCOMMON, W
+0748  00BC     MOVWF c
+89:                d=b/10;
+0749  300A     MOVLW 0xA
+074A  00F0     MOVWF __pcstackCOMMON
+074B  3000     MOVLW 0x0
+074C  00F1     MOVWF 0x71
+074D  0841     MOVF 0x41, W
+074E  00F3     MOVWF 0x73
+074F  0840     MOVF b, W
+0750  00F2     MOVWF dividend
+0751  120A     BCF PCLATH, 0x4
+0752  118A     BCF PCLATH, 0x3
+0753  2609     CALL 0x609
+0754  120A     BCF PCLATH, 0x4
+0755  118A     BCF PCLATH, 0x3
+0756  0871     MOVF 0x71, W
+0757  1283     BCF STATUS, 0x5
+0758  1303     BCF STATUS, 0x6
+0759  00C3     MOVWF 0x43
+075A  0870     MOVF __pcstackCOMMON, W
+075B  00C2     MOVWF d
+90:                e=d%10; //2nd digit is saved here
+075C  300A     MOVLW 0xA
+075D  00F0     MOVWF __pcstackCOMMON
+075E  3000     MOVLW 0x0
+075F  00F1     MOVWF 0x71
+0760  0843     MOVF 0x43, W
+0761  00F3     MOVWF 0x73
+0762  0842     MOVF d, W
+0763  00F2     MOVWF dividend
+0764  120A     BCF PCLATH, 0x4
+0765  118A     BCF PCLATH, 0x3
+0766  25D7     CALL 0x5D7
+0767  120A     BCF PCLATH, 0x4
+0768  118A     BCF PCLATH, 0x3
+0769  0871     MOVF 0x71, W
+076A  1283     BCF STATUS, 0x5
+076B  1303     BCF STATUS, 0x6
+076C  00B5     MOVWF 0x35
+076D  0870     MOVF __pcstackCOMMON, W
+076E  00B4     MOVWF e
+91:                f=d/10;
+076F  300A     MOVLW 0xA
+0770  00F0     MOVWF __pcstackCOMMON
+0771  3000     MOVLW 0x0
+0772  00F1     MOVWF 0x71
+0773  0843     MOVF 0x43, W
+0774  00F3     MOVWF 0x73
+0775  0842     MOVF d, W
+0776  00F2     MOVWF dividend
+0777  120A     BCF PCLATH, 0x4
+0778  118A     BCF PCLATH, 0x3
+0779  2609     CALL 0x609
+077A  120A     BCF PCLATH, 0x4
+077B  118A     BCF PCLATH, 0x3
+077C  0871     MOVF 0x71, W
+077D  1283     BCF STATUS, 0x5
+077E  1303     BCF STATUS, 0x6
+077F  00C5     MOVWF 0x45
+0780  0870     MOVF __pcstackCOMMON, W
+0781  00C4     MOVWF f
+92:                g=f%10; //1st digit is saved here
+0782  300A     MOVLW 0xA
+0783  00F0     MOVWF __pcstackCOMMON
+0784  3000     MOVLW 0x0
+0785  00F1     MOVWF 0x71
+0786  0845     MOVF 0x45, W
+0787  00F3     MOVWF 0x73
+0788  0844     MOVF f, W
+0789  00F2     MOVWF dividend
+078A  120A     BCF PCLATH, 0x4
+078B  118A     BCF PCLATH, 0x3
+078C  25D7     CALL 0x5D7
+078D  120A     BCF PCLATH, 0x4
+078E  118A     BCF PCLATH, 0x3
+078F  0871     MOVF 0x71, W
+0790  1283     BCF STATUS, 0x5
+0791  1303     BCF STATUS, 0x6
+0792  00B7     MOVWF 0x37
+0793  0870     MOVF __pcstackCOMMON, W
+0794  00B6     MOVWF g
+93:                h=f/10;
+0795  300A     MOVLW 0xA
+0796  00F0     MOVWF __pcstackCOMMON
+0797  3000     MOVLW 0x0
+0798  00F1     MOVWF 0x71
+0799  0845     MOVF 0x45, W
+079A  00F3     MOVWF 0x73
+079B  0844     MOVF f, W
+079C  00F2     MOVWF dividend
+079D  120A     BCF PCLATH, 0x4
+079E  118A     BCF PCLATH, 0x3
+079F  2609     CALL 0x609
+07A0  120A     BCF PCLATH, 0x4
+07A1  118A     BCF PCLATH, 0x3
+07A2  0871     MOVF 0x71, W
+07A3  1283     BCF STATUS, 0x5
+07A4  1303     BCF STATUS, 0x6
+07A5  00B9     MOVWF 0x39
+07A6  0870     MOVF __pcstackCOMMON, W
+07A7  00B8     MOVWF h
+94:                //***End of splitting***//
+95:            
+96:                PORTD=seg[a];
+07A8  083A     MOVF a, W
+07A9  00F9     MOVWF 0x79
+07AA  0779     ADDWF 0x79, W
+07AB  3E20     ADDLW 0x20
+07AC  0084     MOVWF FSR
+07AD  1383     BCF STATUS, 0x7
+07AE  0800     MOVF INDF, W
+07AF  0088     MOVWF PORTD
+97:                s1=1; //Turn ON display 1 and print 4th digit
+07B0  1409     BSF PORTE, 0x0
+98:                __delay_ms(5);
+07B1  3021     MOVLW 0x21
+07B2  00FA     MOVWF 0x7A
+07B3  3076     MOVLW 0x76
+07B4  00F9     MOVWF 0x79
+07B5  0BF9     DECFSZ 0x79, F
+07B6  2FB5     GOTO 0x7B5
+07B7  0BFA     DECFSZ 0x7A, F
+07B8  2FB5     GOTO 0x7B5
+07B9  0000     NOP
+99:                s1=0;     //Turn OFF display 1 after 5ms delay
+07BA  1283     BCF STATUS, 0x5
+07BB  1303     BCF STATUS, 0x6
+07BC  1009     BCF PORTE, 0x0
+100:               PORTD=seg[c];
+07BD  083C     MOVF c, W
+07BE  00F9     MOVWF 0x79
+07BF  0779     ADDWF 0x79, W
+07C0  3E20     ADDLW 0x20
+07C1  0084     MOVWF FSR
+07C2  1383     BCF STATUS, 0x7
+07C3  0800     MOVF INDF, W
+07C4  0088     MOVWF PORTD
+101:               s2=1; //Turn ON display 2 and print 3rd digit
+07C5  1489     BSF PORTE, 0x1
+102:               __delay_ms(5);
+07C6  3021     MOVLW 0x21
+07C7  00FA     MOVWF 0x7A
+07C8  3076     MOVLW 0x76
+07C9  00F9     MOVWF 0x79
+07CA  0BF9     DECFSZ 0x79, F
+07CB  2FCA     GOTO 0x7CA
+07CC  0BFA     DECFSZ 0x7A, F
+07CD  2FCA     GOTO 0x7CA
+07CE  0000     NOP
+103:               s2=0;     //Turn OFF display 2 after 5ms delay
+07CF  1283     BCF STATUS, 0x5
+07D0  1303     BCF STATUS, 0x6
+07D1  1089     BCF PORTE, 0x1
+104:           
+105:               if(flag>=100) //wait till flag reaches 100
+07D2  083F     MOVF 0x3F, W
+07D3  3A80     XORLW 0x80
+07D4  00FF     MOVWF 0x7F
+07D5  3080     MOVLW 0x80
+07D6  027F     SUBWF 0x7F, W
+07D7  1D03     BTFSS STATUS, 0x2
+07D8  2FDB     GOTO 0x7DB
+07D9  3064     MOVLW 0x64
+07DA  023E     SUBWF flag, W
+07DB  1C03     BTFSS STATUS, 0x0
+07DC  2FE7     GOTO 0x7E7
+106:               {
+107:                   i++;flag=0; //only if flag is hundred "i" will be incremented 
+07DD  3001     MOVLW 0x1
+07DE  1283     BCF STATUS, 0x5
+07DF  1303     BCF STATUS, 0x6
+07E0  07C6     ADDWF i, F
+07E1  1803     BTFSC STATUS, 0x0
+07E2  0AC7     INCF 0x47, F
+07E3  3000     MOVLW 0x0
+07E4  07C7     ADDWF 0x47, F
+07E5  01BE     CLRF flag
+07E6  01BF     CLRF 0x3F
+108:               }
+109:               flag++; //increment flag for each flash
+07E7  3001     MOVLW 0x1
+07E8  1283     BCF STATUS, 0x5
+07E9  1303     BCF STATUS, 0x6
+07EA  07BE     ADDWF flag, F
+07EB  1803     BTFSC STATUS, 0x0
+07EC  0ABF     INCF 0x3F, F
+07ED  3000     MOVLW 0x0
+07EE  07BF     ADDWF 0x3F, F
+07EF  2F10     GOTO 0x710
+110:               }
+111:           }
+112:           
+113:           
+114:           /*****************************USART Initialization*******************************/
+115:           void USART_Init(long baud_rate)
+116:           {
+117:               float temp;
+118:               TRISC6=0;                       /*Make Tx pin as output*/
+119:               TRISC7=1;                       /*Make Rx pin as input*/
+120:               temp=Baud_value;     
+121:               SPBRG=(int)temp;                /*baud rate=9600, SPBRG = (F_CPU /(64*9600))-1*/
+122:               TXSTA=0x20;                     /*Transmit Enable(TX) enable*/ 
+123:               RCSTA=0x90;                     /*Receive Enable(RX) enable and serial port enable */
+124:           }
+125:           /******************TRANSMIT FUNCTION*****************************************/ 
+126:           void USART_TxChar(char out)
+127:           {        
+128:                   while(TXIF==0);            /*wait for transmit interrupt flag*/
+129:                   TXREG=out;                 /*wait for transmit interrupt flag to set which indicates TXREG is ready
+130:                                               for another transmission*/    
+131:           }
+132:           /*******************RECEIVE FUNCTION*****************************************/
+133:           char USART_RxChar()
+134:           {
+135:              
+136:               
+137:               while(RCIF==0);                 /*wait for receive interrupt flag*/
+138:               if(RCSTAbits.OERR)
+139:               {           
+140:                   CREN = 0;
+141:                   NOP();
+142:                   CREN=1;
+143:               }
+144:               return(RCREG);                  /*receive data is stored in RCREG register and return to main program */
+145:           }
+146:           
+147:           void USART_SendString(const char *out)
+148:           {
+149:              while(*out!='\0')
+150:              {            
+151:                   USART_TxChar(*out);
+152:                   out++;
+153:              }
+154:           }
