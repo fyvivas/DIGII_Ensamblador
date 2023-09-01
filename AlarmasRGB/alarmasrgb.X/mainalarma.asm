@@ -1,0 +1,101 @@
+; PIC16F887 Configuration Bit Settings
+
+; Assembly source line config statements
+
+   
+#include "p16f887.inc"
+
+; CONFIG1
+; __config 0x28D5
+ __CONFIG _CONFIG1, _FOSC_INTRC_CLKOUT & _WDTE_OFF & _PWRTE_OFF & _MCLRE_OFF & _CP_OFF & _CPD_OFF & _BOREN_OFF & _IESO_OFF & _FCMEN_ON & _LVP_OFF
+; CONFIG2
+; __config 0x3FFF
+ __CONFIG _CONFIG2, _BOR4V_BOR40V & _WRT_OFF
+
+    LIST p=16F887
+    
+N EQU 0xD0
+cont1 EQU 0x20 
+cont2 EQU 0x21 
+
+var1 equ 0x22
+VAL_HIGH equ .127
+VAL_LOW	 equ .64
+LED_VERDE equ 0
+LED_AMARILLO equ 1
+LED_ROJO equ 2
+ 
+    ORG	0x00
+    GOTO INICIO
+    
+INICIO
+    MOVLW .0
+    MOVWF var1
+
+CONFIG_LED
+    ;BANK 1
+    BCF STATUS,RP1  ;RP1 = 0
+    BSF STATUS,RP0   ;RP0 = 1
+    MOVLW b'11111000'	;SET RB0, RB1, RB2 AS OUTPUT
+    MOVWF TRISE
+    ;BANK 0
+    BCF STATUS,RP0
+    CLRF PORTE
+  
+VERIF_HIGH
+    MOVF var1,0
+    SUBLW VAL_HIGH
+    BTFSC STATUS,C
+    GOTO VERIF_LOW
+    GOTO LED_VERDE_FUNC
+ 
+VERIF_LOW
+    MOVF var1,0
+    SUBLW VAL_LOW
+    BTFSC STATUS,C
+    GOTO LED_ROJO_FUNC
+    GOTO LED_AMARI_FUNC    
+    
+LED_VERDE_FUNC
+    BSF PORTE,LED_VERDE ;RB0 = 1
+    BCF PORTE,LED_AMARILLO  ;RB1 = 0
+    BCF PORTE,LED_ROJO  ;RB2 = 0
+    GOTO INC_VAR
+
+LED_AMARI_FUNC
+    BCF PORTE,LED_VERDE ;RB0 = 0
+    BSF PORTE,LED_AMARILLO  ;RB1 = 1
+    BCF PORTE,LED_ROJO  ;RB2 = 0
+    GOTO INC_VAR
+   
+LED_ROJO_FUNC
+    BCF PORTE,LED_VERDE ;RB0 = 0
+    BCF PORTE,LED_AMARILLO  ;RB1 = 0
+    BSF PORTE,LED_ROJO  ;RB2 = 1
+    GOTO INC_VAR
+    
+INC_VAR
+    INCF var1,1
+    CALL RETARDO 
+    CALL RETARDO
+    GOTO VERIF_HIGH
+    
+RETARDO
+    MOVLW N
+    MOVWF cont1
+    
+REP_1
+    MOVLW N
+    MOVWF cont2
+    
+REP_2
+    DECFSZ cont2,1
+    GOTO REP_2
+    DECFSZ cont1,1
+    GOTO REP_1
+    RETURN
+    
+    
+    END
+    
+    
